@@ -9,12 +9,14 @@
 #define SCREEN_HEIGHT 64 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-const int current_sensor_pin = A0;
-const int voltage_sensor_Pin = A2;
+const int voltage_sensor_Pin = A1;
+const int current_sensor_pin = A2;
 float Read_voltage();
 float Read_current();
+float Read_power();
 float r1 = 10000;
 float r2 = 3000;
+float i,v;
 
 void setup()
 {
@@ -32,16 +34,18 @@ void loop() {
  
 display.clearDisplay();
 display.setCursor(0, 0);
-display.print("V= " + String(Read_voltage()) + " V\n\nI= " + String(Read_current()) + " A");
+display.print("V=" + String(Read_voltage()) + " V\nI=" + String(Read_current()) + " A\n");
+display.print("P=" + String(Read_power()) + " W");
 display.display();
-delay(300);
+delay(500);
 }
 // USER_FUNCTION_DEFNITIONS
 float Read_voltage()
 {
   int value_in = analogRead(voltage_sensor_Pin);
   float temp_1 = value_in * 5/1023.0;
-  float v = temp_1*(r1+r2)/r2;
+  v = temp_1*(r1+r2)/r2;
+  v = v-0.465;
   return v;
 }
 
@@ -49,6 +53,13 @@ float Read_current()
 {
   int adc = analogRead(current_sensor_pin);
   float temp_v = adc*5/1023.0;
-  float i = (temp_v -2.5)/0.185;
+  i = (temp_v -2.5)/0.185;
+  i = i+0.74599;
   return i ;
 }
+
+float Read_power()
+{
+  float pow = i*v;
+  return pow ;
+  }
